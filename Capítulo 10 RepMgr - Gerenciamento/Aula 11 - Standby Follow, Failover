@@ -1,0 +1,109 @@
+Sempre que o servidor master sofre uma parada e um servidor slave assume, havendo outras réplicas, estas podem ficar orfãs pois não receberam mais atualização de WAL.
+
+Seguir o novo Master
+
+Após uma falha ou remoção do servidor master existente no cluster, o repmgr oferece o comando repmgr standby follow que pode ser usado para fazer com que as outras réplicas sigam o novo master, ficando seus dados atualizados.
+
+$ repmgr -f /etc/repmgr.conf -D /path/to/node_3/data/ -h repmgr_node2 -U repmgr -d repmgr standby follow
+[2016-01-08 16:57:06] [NOTICE] restarting server using '/usr/bin/postgres/pg_ctl -D /path/to/node_3/data/ -w -m fast restart'
+waiting for server to shut down.... done
+server stopped
+waiting for server to start.... done
+server started
+O slave agora estará replicando do novo master e a tabela repl_nodes foi atualizada para refletir isso:
+
+ id |  type   | upstream | cluster | name  |                  conninfo                   | active
+----+---------+----------+---------+-------+---------------------------------------------+-------
+  1 | master  |          | test    | node1 | host=repmgr_node1 dbname=repmgr user=repmgr | f
+  2 | master  |          | test    | node2 | host=repmgr_node2 dbname=repmgr user=repmgr | t
+  3 | standby |        2 | test    | node3 | host=repmgr_node3 dbname=repmgr user=repmgr | t
+(3 rows)
+
+
+Failover automático
+
+Para que haja o funcionamento correto do failover automático, é necessário que a daemon repmgrd seja executado. O repmgrd é um daemon de gerenciamento e monitoramento que roda em nós slaves e que pode automatizar ações, tais como failover e follow.
+
+Para usar repmgrd com failover automático, as seguintes opções devem ser definidas no repmgr.conf:
+
+failover=automatic
+promote_command='repmgr standby promote -f /etc/repmgr/repmgr.conf'
+follow_command='repmgr standby follow -f /etc/repmgr/repmgr.conf'
+Também deve-se configurar o postgresql.conf, e adicionar a linha abaixo (necessário reinicialização):
+
+shared_preload_libraries = 'repmgr_funcs'
+Quando failover estiver definido como automático, ao detectar a falha do master, o repmgrd executará um o comando promote_command ou follow_command, dependendo se o servidor atual está se tornando o novo master ou se precisa seguir outro servidor que se tornou o novo master.
+
+Note-se que esses comandos podem ser usados em qualquer scriptshell válido, mas é altamente recomendável executar repmgr manualmente.
+
+O repmgrd pode ser iniciado simplesmente com:
+
+repmgrd -f /etc/repmgr.conf --verbose > $HOME/repmgr/repmgr.log 2>&1
+Para um funcionamento permanente, recomendamos o uso da opção -d/--daemonize para separar o processo repmgrd e a opção -p/--pid-file para escrever o PID do processo em um arquivo.
+
+Note-se que atualmente repmgrd não precisa ser executado no servidor master.
+
+Para demonstrar o failover automático, configura um cluster com 3 nós (um master e dois slaves de streaming replication), de modo que a tabela de repl_nodes pareça com isso:
+
+repmgr=# SELECT * FROM repmgr_test.repl_nodes ORDER BY id;
+ id |  type   | upstream | cluster | name  |                  conninfo                   | priority | active
+----+---------+----------+---------+-------+---------------------------------------------+----------+--------
+  1 | master  |          | test    | node1 | host=repmgr_node1 dbname=repmgr user=repmgr |      100 | t
+  2 | standby |        1 | test    | node2 | host=repmgr_node2 dbname=repmgr user=repmgr |      100 | t
+  3 | standby |        1 | test    | node3 | host=repmgr_node3 dbname=repmgr user=repmgr |      100 | t
+(3 rows)
+Inicie o repmgrd em cada slave e verifique se ele está funcionando, examinando a saída do log, que será parecido com isto:
+
+[2016-01-05 13:15:40] [INFO] checking cluster configuration with schema 'repmgr_test'
+[2016-01-05 13:15:40] [INFO] checking node 2 in cluster 'test'
+[2016-01-05 13:15:40] [INFO] reloading configuration file and updating repmgr tables
+[2016-01-05 13:15:40] [INFO] starting continuous standby node monitoring
+Cada repmgrd também deve ter sua inicialização bem-sucedida na tabela de repl_events:
+
+repmgr=# SELECT * FROM repl_events WHERE event = 'repmgrd_start';
+ node_id |     event     | successful |        event_timestamp        | details
+---------+---------------+------------+-------------------------------+---------
+       2 | repmgrd_start | t          | 2016-01-27 18:22:38.080231+09 |
+       3 | repmgrd_start | t          | 2016-01-27 18:22:38.08756+09  |
+(2 rows)
+
+Agora, pare o servidor master, por exemplo .:
+
+pg_ctl -D /path/to/node1/data -m immediate stop
+Isso forçará o nó master a encerrar de imediato, abortando todos os processos e operações. Isso lançará uma enxurrada de atividades nos arquivos de log do repmgrd, como cada repmgrd detecta a falha do master, uma decisão de failover é tomada. Aqui o servidor slave que será promovido a novo master:
+
+[2016-01-06 18:32:58] [WARNING] connection to upstream has been lost, trying to recover... 15 seconds before failover decision
+[2016-01-06 18:33:03] [WARNING] connection to upstream has been lost, trying to recover... 10 seconds before failover decision
+[2016-01-06 18:33:08] [WARNING] connection to upstream has been lost, trying to recover... 5 seconds before failover decision
+...
+[2016-01-06 18:33:18] [NOTICE] this node is the best candidate to be the new master, promoting...
+...
+[2016-01-06 18:33:20] [NOTICE] STANDBY PROMOTE successful
+e aqui, os outros servidores slaves, que irão seguir o novo master:
+
+[2016-01-06 18:32:58] [WARNING] connection to upstream has been lost, trying to recover... 15 seconds before failover decision
+[2016-01-06 18:33:03] [WARNING] connection to upstream has been lost, trying to recover... 10 seconds before failover decision
+[2016-01-06 18:33:08] [WARNING] connection to upstream has been lost, trying to recover... 5 seconds before failover decision
+...
+[2016-01-06 18:33:23] [NOTICE] node 2 is the best candidate for new master, attempting to follow...
+[2016-01-06 18:33:23] [INFO] changing standby's master
+...
+[2016-01-06 18:33:25] [NOTICE] node 3 now following new upstream node 2
+A tabela repl_nodes deverá ser atualizada para refletir a nova situação, com o master original (node1) marcado como inativo, e node3 irá seguir o novo master (node2):
+
+repmgr=# SELECT * from repl_nodes ORDER BY id;
+ id |  type   | upstream_node_id | cluster | name  |                 conninfo                 | slot_name | priority | active
+----+---------+------------------+---------+-------+------------------------------------------+-----------+----------+--------
+  1 | master  |                  | test    | node1 | host=localhost dbname=repmgr user=repmgr |           |      100 | f
+  2 | master  |                  | test    | node2 | host=localhost dbname=repmgr user=repmgr |           |      100 | t
+  3 | standby |                2 | test    | node3 | host=localhost dbname=repmgr user=repmgr |           |      100 | t
+(3 rows)
+A tabela repl_events conterá um resumo do que aconteceu com cada servidor durante o failover:
+
+repmgr=# SELECT * from repmgr_test.repl_events where event_timestamp>='2016-01-06 18:30';
+ node_id |          event           | successful |        event_timestamp        |                         details
+---------+--------------------------+------------+-------------------------------+----------------------------------------------------------
+       2 | standby_promote          | t          | 2016-01-06 18:33:20.061736+09 | node 2 was successfully promoted to master
+       2 | repmgrd_failover_promote | t          | 2016-01-06 18:33:20.067132+09 | node 2 promoted to master; old master 1 marked as failed
+       3 | repmgrd_failover_follow  | t          | 2016-01-06 18:33:25.331012+09 | node 3 now following new upstream node 2
+(3 rows)

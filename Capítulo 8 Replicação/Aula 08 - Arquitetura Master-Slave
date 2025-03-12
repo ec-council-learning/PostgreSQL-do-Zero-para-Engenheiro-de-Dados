@@ -1,0 +1,7 @@
+A arquitetura mais comum, é termos uma máquina master, uma réplica que é o slave e a máquina de backup que armazena meu backup inicial e meus WAL's (archives).
+
+A réplica deve receber através do streaming replication as DML's vindas das transações, e caso haja uma parada inesperada entre as máquinas, a réplica consuma os arquivos de WAL, através do log shipping. Dessa forma, a réplica nunca ficará desatualizada em relação ao master, e pode ser usada para leitura.
+
+
+
+Arquitetura Master/Slave

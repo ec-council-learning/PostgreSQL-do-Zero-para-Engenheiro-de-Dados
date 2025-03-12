@@ -1,0 +1,47 @@
+ACID
+O PostgreSQL é considerado o banco de dados livre mais avançado do mundo por várias razões. Suporta largamente o padrão ANSI-SQL e respeita a norma ACID. É altamente extensível, tem vários tipos de índices/dados para diversas aplicações.
+
+Pode ser instalado na maioria dos sistemas operacionais tipo Unix como Linux, Solaris, AIX, HP-UX, família BSD, Mac OS X, Tru64, etc. Atualmente conta também com porte nativo para Windows, apesar de não ser uma boa opção.
+
+A licença utilizada é a BSD, que permite a redistribuição comercial em formato binário, original ou alterada, do programa ou da documentação, desde que seja mantida a citação original dos desenvolvedores, do código original da Universidade da Califórnia e a ausência de garantias.
+
+A maioria das linguagens de programação modernas preveem interface nativa para o PostgreSQL. Para as linguagens que não possuem interface nativa pode ser feito o acesso através da interface ODBC. Aplicações Java contam com driver JDBC 3 e 4.
+
+Existem centenas de projetos livres e comerciais relacionados à administração, monitoramento, interfaceamento e extensão do PostgreSQL. Existe tradução para 24 idiomas, porém em Português está desatualizado e falta pessoas para ajudar.
+
+Várias empresas estão envolvidas no desenvolvimento do PostgreSQL contratando desenvolvedores, contribuindo com código ou patrocinando o desenvolvimento como EnterpriseDB, Fujitsu, NTT, Vmware, Google, HP, RedHat, Skype, entre outras.
+
+Suporte gratuito está disponível pela comunidade internacional e brasileira. Diversas empresas e consultores independentes oferecem suporte comercial.
+
+Versionamento e atualização
+Sendo um projeto comunitário, o PostgreSQL provê atualizações através do site oficial www.postgresql.org. Se o pacote instalado for fornecido diretamente pelo seu S.O., verifique as opções de atualização disponíveis.
+
+Versionamento
+As versões do PostgreSQL são divididas em majoritárias e minoritárias. As versões majoritárias são identificadas pelos primeiros dois números da versão, também chamadas de série. As versões minoritárias são identificadas pelo último número da versão.
+
+As versões majoritárias atualmente disponíveis (em 2016) para download são as séries 9.1.x, 9.2.x, 9.3.x,9.4.x e 9.5.x.
+
+Atualmente (2016) as versões suportadas são da 9.1 até a 9.5, versões anteriores a 9.1 não são mais suportadas pela comunidade, nestes casos é extremamente recomendável a atualização para uma das versões mais novas e suportadas. Uma versão majoritária é lançada a cada, aproximadamente, um ano, após extensivos testes. Novas versões majoritárias costumam incluir novas funcionalidades ao PostgreSQL, que são normalmente discutidas nas listas internacionais de discussão, na página wiki do Roadmap e debatidas e aprovadas na reunião de desenvolvedores, que ocorre em paralelo ao evento PgCon, no Canadá, no mês de maio de cada ano.
+
+As versões majoritárias antigas costumam ser mantidas por 4 a 5 anos, sendo um prazo máximo de até 6 anos em alguns casos e dependendo das necessidades dos usuários e quantidade de funcionalidades envolvidas. Antes de ser descontinuada, a comunidade costuma informar através das listas de discussão com antecedência, de forma a prevenir os DBAs.
+
+As versões majoritárias são atualizadas justamente pelas versões minoritárias. Todas as séries mantidas atualmente tem correções de bugs e de questões de segurança. Um exemplo de versão minoritária disponível atualmente (em maio de 2016) é a 9.5.2, significando que têm todas as funcionalidades da série 9.5.x, sendo que existe somente 2 versões de correção que foram lançadas.
+
+Atualização
+Na prática, recomenda-se sempre ler as notas de lançamento e verificar se algum bug relevante ao ambiente em produção foi corrigido e aplicar a nova versão caso necessário. Se seus dados estão em risco, recomenda-se fortemente a atualização.
+
+ 
+
+Observação: na distribuição Debian GNU/Linux as versões minoritárias são atualizadas com uma nomenclatura ligeiramente diferente da utilizada pela comunidade PostgreSQL, incluindo um sufixo. A comunidade Debian aplica todas as versões minoritárias do PostgreSQL.
+
+Se o fornecedor do seu sistema operacional não fornece atualizações de segurança da série utilizada em seu ambiente, considere utilizar os pacotes de instalação disponíveis em www.postgresql.org.
+
+Caso não exista pacote disponível para seu sistema operacional, considere a possibilidade de compilar o PostgreSQL diretamente no seu ambiente.
+
+ 
+
+Comunidade Brasil: https://www.postgresql.org.br/
+
+Lista de Discussão: https://listas.postgresql.org.br/cgi-bin/mailman/listinfo/pgbr-geral (Tem que cadastrar para participar)
+
+Bibliografias: http://www.postgresql.org/docs/books/

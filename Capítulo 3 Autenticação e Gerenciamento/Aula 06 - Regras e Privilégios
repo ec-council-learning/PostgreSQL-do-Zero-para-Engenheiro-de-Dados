@@ -1,0 +1,54 @@
+Concessão de privilégios
+
+Os comandos para concessão e revogação de privilégios são, respectivamente, GRANT e REVOKE.
+
+Papéis donos de objetos terão todos os privilégios sobre eles por padrão, exceto se especificado o contrário explicitamente. Eles também poderão conceder e revogar privilégios dos objetos dos quais são os próprios donos.
+
+Papéis de superusuário terão todos os privilégios sobre todos os objetos do cluster, podendo conceder e revogar privilégios de todos a qualquer momento.
+
+As sintaxes de GRANT e REVOKE são:
+
+GRANT [privilégio] ON [objeto] TO [papel];
+REVOKE [privilégio] ON [objeto] FROM [papel];
+Papéis de usuário pertencentes a papéis de grupos herdarão os privilégios do papel de grupo.
+
+Um grande desejo dos usuários era poder atribuir privilégios a mais de um objeto ao mesmo tempo. A partir da versão 9.0 do PostgreSQL, [objeto] pode ser substituído por:
+
+ALL TABLES IN SCHEMA [nome_do_schema]
+ALL SEQUENCES IN SCHEMA [nome_do_schema]
+ALL FUNCTIONS IN SCHEMA [nome_do_schema]
+Papéis de grupo
+
+A criação de papéis de grupo é o comando genérico, sem a opção LOGIN: CREATE ROLE [nome do grupo];
+
+Inserir e remover papéis de usuário nos papéis de grupo também é feito com GRANT e REVOKE, respectivamente:
+
+GRANT [nome do grupo] TO [usuário1], [usuário2]...
+REVOKE [nome do grupo] FROM [usuário1], [usuário2]...
+Tipos de privilégio
+
+A lista a seguir mostra todos os privilégios que podem ser utilizados com GRANT e REVOKE.
+
+SELECT - Permite executar o comando SQL SELECT, que permite visualizar dados. Também permite o comando exclusivo do PostgreSQL COPY TO. (Este comando exporta a saída de uma consulta para dentro de um arquivo, delimitado por algum caracter de separação, por exemplo, uma virgula ',')
+Para permitir os privilégios UPDATE e DELETE, é obrigatória também a permissão de SELECT.
+
+INSERT - Permite INSERT, inserir novos registros. Também permite, o comando exclusivo do PostgreSQL COPY FROM.
+UPDATE - Permite UPDATE, atualizar registros.
+Permite SELECT ... FOR UPDATE e SELECT ... FOR SHARE, e é o privilégio que pode ser atribuído a sequências, permitindo as funções nextval e setval.
+
+DELETE - Permite DELETE, remover registros.
+TRUNCATE - Permite TRUNCATE, zerar todos os registros de uma tabela.
+REFERENCES - Permite que o papel crie novas chaves estrangeiras, deve ser assinalado para ambas as tabelas envolvidas.
+TRIGGER - Permite que o papel crie gatilhos em tabelas.
+CREATE - Pode ser atribuído a bancos de dados, permitindo ao papel criar novos schemas.
+Pode ser atribuído a schemas, permitindo ao papel criar novos objetos no schema.
+Pode ser atribuído a tablespaces, permitindo ao papel criar ou mover tabelas, índices e arquivos temporários para dentro da tablespace.
+CONNECT - Permite a conexão a um banco de dados.
+O PostgreSQL trabalha com privilégios padrões para certos tipos de objetos. Todos os bancos de dados possuem privilégio CONNECT para todos, PUBLIC, portanto, ao remover o privilégio CONNECT de um papel, ele continuará podendo se conectar ao banco de dados, até que o privilégio seja também removido do banco de dados para todos.
+TEMPORARY/TEMP - Ambas as formas são válidas. Este privilégio é dado sobre bancos de dados, e permitem ao papel a criação de tabelas temporárias.
+EXECUTE - Único privilégio associado a funções, permite a execução delas.
+USAGE - Único privilégio associado a linguagens procedurais, permitem ao papel criar novas funções baseadas na linguagem.
+Para schemas permite o acesso a seu conteúdo, observados os demais privilégios dos objetos ali contidos.
+ALL/ALL PRIVILEGES - Atalho para todos os privilégios. Ambas as sintaxes são corretas por compatibilidade.
+Ao passar este privilégio no comando GRANT, todos os privilégios relacionados ao objeto especificado serão permitidos ao usuário. De forma similar, ao passar este privilégio no comando REVOKE, todos os privilégios relacionados ao objeto especificado serão retirados do usuário.
+No PostgreSQL existe um pseudo grupo chamado PUBLIC, do qual todos os outros papéis fazem parte. Em outras palavras pode-se dizer que todo papel existente terá a soma do privilégios concedidos diretamente a ele, mais os privilégios de um possível papel de grupo e mais os privilégios concedidos ao PUBLIC. Para conceder ou revogar privilégios ao PUBLIC, utilize-o no lugar do nome do papel nos comandos GRANT e REVOKE.

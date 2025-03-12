@@ -1,0 +1,14 @@
+Em um ambiente crítico, cujo uma parada no servidor é inaceitável. A única saída é possuir um ambiente com réplicas e preparados para alta disponibilidade. Em um momento de parada inesperada a réplica deve está pronta para assumir o papel de master e não deixar que o ambiente fique parado por muito tempo. Muitas vezes, aplicações são usadas para que o tempo de virada seja mínimo e não impacte a aplicação e não seja sentida pelos usuários.
+
+O modelo Hot-standby, introduzido na versão 9.0, consiste de um servidor master e de um slave, o qual permanece online somente para consultas até que seja promovido a master e passe a permitir escrita e leitura. A replicação nativa do PostgreSQL é física, por isso, não é possível replicar somente alguns objetos, ou seja, na replicação nativa somente é possível realizar a replicação do um cluster como um todo. Por ser uma replicação física também é necessário que a versão e arquitetura do PostgreSQL sejam idênticas.
+
+Além de permitir a alta disponibilidade, a replicação em “hot-standby”, também permite o balanceamento de consultas, e ou isolar consultas pesadas de sistemas de BI.
+
+O funcionamento do “hot-standby” é bem similar a um backup PITR, porem com as seguintes diferenças:
+
+Os logs de transação são aplicados assim que chegam no slave.
+Os logs de transação podem ser transmitidos através de streaming, ou seja, as transações são replicadas no momento em que são concluídas, não havendo a necessidade de esperar o preenchimento do segmento.
+É importante salientar, que o uso do “streaming replication” não é obrigatório para o “hot-standby”, inclusive é possível se utilizar de “streaming replication” e “archiving” juntos, de forma que se a conexão do streaming for cortada por algum motivo o PostgreSQL passa utilizar os segmentos arquivados.
+
+Documentação oficial: http://www.postgresql.org/docs/9.5/static/high-availability.html
+Documentação replicação: http://www.postgresql.org/docs/9.5/static/warm-standby.html

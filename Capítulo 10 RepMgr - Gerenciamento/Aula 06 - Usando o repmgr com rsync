@@ -1,0 +1,18 @@
+Usando rsync para clonar slave
+
+Por padrão, o repmgr usa o utilitário pg_basebackup para clonar diretório de um servidor master. Em algumas circunstâncias, pode ser desejável usar o rsync para fazer isso, como quando uma re-sincronização do diretório de dados de um servidor falhou. O rsync somente substitui os arquivos que foram alterados, fazendo uma checagem de checksum e verificando quais ainda não foram enviados, ou foram alterados em relação ao que já foi enviado.
+
+Para usar o rsync, em vez de pg_basebackup, forneça o -r/--rsync-only como opção ao executar o comando repmgr standby clone.
+
+Note-se que repmgr força o uso rsync com --checksum de modo a garantir que todos os arquivos necessários são copiados. Isso resulta em I/O adicional em ambos os servidores de origem e de destino, como o conteúdo dos arquivos existentes em ambos os servidores precisam ser comparados, isso significa que este método não é necessariamente mais rápido do que fazer um clone fresco com pg_basebackup.
+
+
+
+Lidando com arquivos de configuração do PostgreSQL
+
+Por padrão, o repmgr tentará copiar os arquivos de configuração padrão (postgresql.conf, pg_hba.conf e pg_ident.conf), mesmo se eles estiverem localizados fora do diretório de dados (embora atualmente eles serão copiados para dentro do diretório de dados do slave). Para evitar que isso aconteça, ao executar o comando repmgr standby clone adicione a opção --ignore-external-config-files.
+
+Se estiver usando rsync para clonar um slave, é possível definir quais arquivos não serão transferidos configurando rsync_options dentro do repmgr.conf, por exemplo .:
+
+rsync_options='--exclude=postgresql.local.conf'
+

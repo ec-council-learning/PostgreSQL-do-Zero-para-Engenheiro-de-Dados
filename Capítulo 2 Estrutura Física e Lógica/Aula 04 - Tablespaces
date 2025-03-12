@@ -1,0 +1,18 @@
+Tablespaces
+É um recurso do PostgreSQL que permite a alocação de objetos do banco de dados em localizações físicas separadas, é considerada uma estrutura física. Cada tablespace reside em um diretório próprio, sendo que esse diretório pode ser exatamente o ponto de montagem de um disco ou LUN independente. O diretório onde uma tablespace será criada deve ser propriedade do usuário/grupo postgres, com permissionamento 0700.
+
+O recurso de tablespaces é muito útil para a distribuição física dos bancos de dados e seus objetos, pois aqueles objetos mais acessados e que, consequentemente, têm uma carga de acesso a disco mais alto, podem ser alocados em recursos específicos de I/O como discos e até mesmo controladoras separadas. Objetos que ocupam muito espaço físico e dependem de manutenção específica também podem se beneficiar deste recurso, uma vez que pode ser alocado exclusivamente em um sistema de discos e de arquivos que permita essa flexibilidade.
+
+É trabalho do DBA identificar os objetos que precisam dessas necessidades especiais, dimensionar e configurar as tablespaces necessárias. Os objetos que podem ser movidos para tablespaces são bancos de dados, tabelas selecionadas ou índices selecionados. A criação de tablespaces é segura, podendo ser realizada a qualquer momento, sem concorrência ou overhead significativo, sem causar impactos em ambientes de produção.
+
+Por padrão, o PostgreSQL coloca todos os dados na tablespace pg_default. Um banco de dados pode ter sua tablespace padrão alterada, de forma que todos os novos objetos, se não indicada na criação, irão para a tablespace padrão. A criação de tablespaces é permitida somente aos superusuários. Outros usuários podem criar objetos dentro das tablespaces, se a eles for concedido esse acesso.
+
+O diretório pg_tblspc do cluster do PostgreSQL conterá links simbólicos para todas as tablespaces criadas. As tablespaces são comuns a todo o cluster. O catálogo de sistema pg_tablespace contém informações sobre as tablespaces criadas. Até a versão 9.1, o caminho do diretório onde residem as tablespaces ficavam disponíveis nesse catálogo. A partir da versão 9.2, isto não está mais disponível por uma decisão técnica que facilita a administração manual via Sistema Operacional, sem depender dos catálogos do PostgreSQL.
+
+É permitido mover as tablespaces para outros locais manualmente. Isso deve ser feito com o PostgreSQL parado. Até a versão 9.1, a tabela pg_tablespace terá de ser atualizada manualmente assim que o servidor subir, para evitar inconsistências. A partir da versão 9.2, isto não é mais necessário, o PostgreSQL se ajusta automaticamente após ser inicializado com a nova localização da tablespace.
+
+A partir da versão 9.2 a coluna com o caminho foi removida da pg_tablespace, pois o link simbólico é suficiente para o funcionamento e em procedimentos de mudança de local físico esta coluna era apenas um dificultador.
+
+Nota: A operação de mover objetos entre tablespaces é demorada, efetua lock nos objetos envolvidos e gera grande carga de IO, pois os dados saíram de um dispositivo e irão para outro dispositivo. Recomenda-se que este tipo de operação seja executada em intervalos de tempo em que os objetos em movimento não estejam em uso. Tablespaces são entidades físicas do banco de dados. O funcionamento lógico não é alterado e nenhuma alteração em aplicações ou consultas SQL isoladas precisa ser feita para objetos que mudaram de tablespace. Para os usuários e aplicações, as tablespaces onde estão os objetos são completamente transparentes.
+
+

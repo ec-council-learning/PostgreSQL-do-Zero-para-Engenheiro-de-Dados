@@ -1,0 +1,14 @@
+A fim de gerir eficazmente um cluster de replicação, o repmgr precisa armazenar as informações sobre os servidores no cluster em um esquema de banco de dados dedicado. Este esquema é criado automaticamente durante o primeiro passo para inicializar um conjunto controlado por repmgr e contém os seguintes objetos:
+
+tabelas:
+
+repl_events: registra eventos de interesse
+repl_nodes: conexão e informações de status para cada servidor no cluster de replicação
+repl_monitor: informação histórica de monitoramento
+visualizações:
+
+repl_show_nodes: com base na tabela repl_nodes, adicionalmente, mostrando o nome do nó
+repl_status: mostra o estado da monitorização de cada nó
+O esquema de metadados do repmgr pode ser armazenada numa base de dados existente, ou na sua própria base de dados dedicada.
+
+Um superusuário do banco de dados dedicado é necessário realizar ações administrativas do repmgr.

@@ -1,0 +1,13 @@
+A melhor forma de garantir um backup correto, é armazenar o backup inicial e um servidor de backup, e configurar o archive_command para enviar os arquivos de WAL's para dentro de um local definido no servidor de backup. Com o servidor de backup ativado, as réplicas podem re-sincronizar usando os arquivo de WAL definidos no servidor de backup, evitando assim, a necessidade de refazer as réplicas.
+
+O PITR permite apenas cópias completas de clusters, inclusive usuários, regras, privilégios, etc. Embora pareça complicado, uma vez habilitado o PITR é muito simples de administrar. A estratégia de backup PITR inicial pode ser feita com o servidor de banco de dados funcionando normalmente. Como os arquivos de dados serão totalmente lidos pelos comandos executados, tenha em mente que existirá um aumento do consumo de I/O que pode afetar as transações normais. Prefira horários de baixo movimento transacional para o backup inicial.
+
+A maior vantagem do PITR é que o cluster terá um backup contínuo e incremental. A estratégia consiste em avisar ao PostgreSQL que um backup será feito. O PostgreSQL marcará então qual foi esse momento. Depois, pode-se copiar normalmente os arquivos dos diretórios de dados e tablespaces sem se preocupar com suas alterações durante o backup. O PostgreSQL gravará as modificações feitas nos arquivos WAL. Após a finalização do backup o recurso de archiving manterá uma alimentação contínua de arquivos WAL para o local de backup especificado.
+
+Portanto o PITR mantém dois momentos: a cópia inicial e o arquivamento contínuo. Reserve espaços especiais em disco para eles. Outra vantagem do PITR é justamente seu nome: recuperação em momento no tempo. O administrador poderá retornar o backup em qualquer momento no tempo desde o backup inicial até o momento da falha. Isto é muito útil em situações em que um usuário executou um comando que destruiu dados em determinado momento do dia, ou se uma nova versão de uma aplicação fez alguma bagunça com seus dados após um deploy.
+
+O comando archive_command deve retornar 0 em caso de sucesso. Se um comando que não retorna 0 for utilizado, ou se o comando falhar por algum motivo (diretório cheio, por exemplo), o PostgreSQL manterá os arquivos não copiados no diretório pg_xlog. Isto precisa ser monitorado pelo administrador.
+
+Após o sucesso, o respectivo arquivo de log de transações será apagado ou renomeado para reuso pelo PostgreSQL, evitando fragmentação do sistema de arquivos.
+
+Obs.: Caso o PostgreSQL não consigo enviar os arquivo de WAL, os mesmos serão mantidos no pg_xlog, e o dispositivo atingindo 100% de utilização, o PostgreSQL irá se auto desligar, pois não possuirá espaço em disco para trabalhar.

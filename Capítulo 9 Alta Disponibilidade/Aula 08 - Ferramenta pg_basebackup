@@ -1,0 +1,9 @@
+A partir da versão 9.1, o PostgreSQL disponibilizou a ferramenta pg_basebackup com o objetivo de auxiliar na criação de réplicas. É usado para fazer backups de um cluster PostgreSQL em execução. São feitas sem afetar outros clientes e pode ser usado tanto para a recuperação point-in-time, como o ponto de partida para um envio de log shipping ou streaming replication de slaves.
+
+O pg_basebackup faz uma cópia binária dos arquivos de cluster de um banco de dados, assegurando ao mesmo tempo a colocação e a saída do sistema em modo backup. Backups são sempre feitos de um cluster inteiro, não é possível fazer backup de bancos de dados individuais ou objetos de banco de dados. Para backups de banco de dados individuais, deve ser utilizada uma ferramenta como o pg_dump.
+
+O backup é feito através de uma conexão PostgreSQL regular, e utiliza o protocolo de replicação. A ligação deve ser feita com um superusuário ou um usuário que tem permissões de replicação, e o pg_hba.conf deve permitir explicitamente a conexão. O servidor também deve ser configurado com uma quantidade de max_wal_senders suficiente para deixar pelo menos uma sessão disponível para o backup.
+
+Pode haver vários pg_basebackup's em execução ao mesmo tempo, mas é melhor do ponto de vista de desempenho fazer apenas um backup, por vez. O pg_basebackup pode fazer uma cópia de segurança, não apenas do master, mas também no slave. Para fazer um backup a partir do slave, configure o slave para que aceite conexões de replicação (ou seja, max_wal_senders definidos e hot_standby, além de configurar a autenticação). Você também precisa definir que o parâmetro full_page_writes=on no master.
+
+Documentação Oficial: http://www.postgresql.org/docs/current/static/app-pgbasebackup.html

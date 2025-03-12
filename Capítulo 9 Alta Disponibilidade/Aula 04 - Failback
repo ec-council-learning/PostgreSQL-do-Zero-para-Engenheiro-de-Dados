@@ -1,0 +1,18 @@
+Sempre que o ambiente sofre com um switchover ou um failback, é normal que queiramos voltar tudo como era antes. Normalmente, porque nossos servidores principais são mais robustos, ou devido a alguma regra de negócio, ou simplesmente porque é assim que deve está.
+
+Failback
+O failback é a volta do serviço principal que sofreu alguma falha, ou seja, o failback é a volta ao estado original do ambiente. Onde cada máquina volta a trabalhar da forma que era antes. No ambiente de banco de dados, o processo de failback também pode ser feito de forma automatizada.
+
+PostgreSQL
+
+Sempre que um slave assume o papel de master, o servidor master original deve está parado. Quando existe a necessidade de fazer um failback, o procedimento a ser executado deve ser o seguinte:
+
+Considere o master a máquina node1 e o slave a máquina node2
+
+É necessário transformar o node1 em um slave, apontando-o para o node2 que é o master atual.
+Depois que ele se tornar uma réplica, faça a virada de chave e transforme o node1 em master novamente.
+Pare o node2.
+É necessário transformar o node2 em slave, apontando-o para o node1 que é o master atual.
+O procedimento parece complicado, e é complicado. Por este motivo, existe ferramentas que nos auxiliam na execução de um failback de forma automatizada. Lembre-se que os parâmetros do arquivo de configuração postgresql.conf devem está configurados corretamente para que essas ações possam ser executadas corretamente.
+
+Documentação Oficial: http://www.postgresql.org/docs/9.5/static/different-replication-solutions.html

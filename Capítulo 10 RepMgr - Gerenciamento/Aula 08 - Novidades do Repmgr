@@ -1,0 +1,65 @@
+Slot's de replicação
+
+O repmgr a partir de sua versão 3.x, trabalha com slot's de replicação incorporados no PostgreSQL 9.4. Para habilitar o repmgr para usar os slot's de replicação, defina o parâmetro use_replication_slots no arquivo repmgr.conf:
+
+use_replication_slots = 1
+Note-se que repmgr falhará com um erro se esta opção for especificada quando se trabalha com PostgreSQL inferior a versão 9.4.
+
+Quando for feito o clone, o repmgr irá gerar automaticamente um nome de slot apropriado, que é armazenado na tabela de repl_nodes, e irá criar o slot no master:
+
+repmgr=# SELECT * from repl_nodes ORDER BY id;
+ id |  type   | upstream | cluster | name  |                 conninfo                 |   slot_name   
+----+---------+----------+---------+-------+------------------------------------------+---------------
+  1 | master  |          | test    | node1 | host=localhost dbname=repmgr user=repmgr | repmgr_slot_1 
+  2 | standby |        1 | test    | node2 | host=localhost dbname=repmgr user=repmgr | repmgr_slot_2 
+  3 | standby |        1 | test    | node3 | host=localhost dbname=repmgr user=repmgr | repmgr_slot_3 
+
+repmgr=# SELECT * FROM pg_replication_slots ;
+   slot_name   | slot_type | datoid | database | active | active_pid | catalog_xmin | restart_lsn
+---------------+-----------+--------+----------+--------+------------+--------------+-------------
+ repmgr_slot_3 | physical  |        |          | t      |      26060 |              | 0/50028F0
+ repmgr_slot_2 | physical  |        |          | t      |      26079 |              | 0/50028F0
+(2 rows)
+Observe que um nome de slot será criado por padrão para o master, mas não será realmente usado a menos que o master seja convertido em modo slave, por exemplo com o comando repmgr standby switchover.
+
+Esteja ciente de que quando iniciar a clonagem de slave, você vai precisar assegurar que todos os WAL necessários permanecem disponíveis enquanto a clonagem está ocorrendo. Se usar o método pg_basebackup padrão, recomendamos definir parâmetro de --xlog-method do pg_basebackup para transmitir como este:
+
+pg_basebackup_options='--xlog-method=stream'
+Caso contrário, é necessário definir wal_keep_segments para um valor suficientemente elevado.
+
+Configurando Replicação em Cascata
+
+A replicação em cascata, introduzido com o PostgreSQL 9.2, permite que um servidor slave possa replicar a partir de outro servidor slave em vez do master. Isto pode ser utilizado para reduzir a carga sobre o master e minimizar o uso de largura de banda entre os locais.
+
+O repmgr suporta replicação em cascata, basta definir no repmgr.conf o parâmetro upstream_node para a identificação do servidor slave a qual irá se conectar. O repmgr irá realizar o clone usando este servidor e criará o recovery.conf para apontar para ele. Note que upstream_node não está expressamente prevista, o repmgr usará o master como o servidor para clonar.
+
+Para demonstrar a replicação em cascata, verifique se você tem um master e um slave configurado. Crie um servidor slave adicional com repmgr.conf parecido com isto:
+
+cluster=test
+node=3
+node_name=node3
+conninfo='host=repmgr_node3 user=repmgr dbname=repmgr'
+upstream_node=2   # Irá se conectar no node 2 para se atualizar
+Certifique-se de upstream contém o ID de nó do slave criado anteriormente. Clonar o slave (usando os parâmetros de conexão para o slave existente) e registrá-lo:
+
+$ repmgr -h repmgr_node2 -U repmgr -d repmgr -D /path/to/node3/data/ -f /etc/repmgr.conf standby clone
+[2016-01-08 13:44:52] [NOTICE] destination directory 'node_3/data/' provided
+[2016-01-08 13:44:52] [NOTICE] starting backup (using pg_basebackup)...
+[2016-01-08 13:44:52] [HINT] this may take some time; consider using the -c/--fast-checkpoint option
+[2016-01-08 13:44:52] [NOTICE] standby clone (using pg_basebackup) complete
+[2016-01-08 13:44:52] [NOTICE] you can now start your PostgreSQL server
+[2016-01-08 13:44:52] [HINT] for example : pg_ctl -D /path/to/node_3/data start
+
+$ repmgr -f /etc/repmgr.conf standby register
+[2016-01-08 14:04:32] [NOTICE] standby node correctly registered for cluster test with id 3 (conninfo: host=repmgr_node3 dbname=repmgr user=repmgr)
+
+repmgr=# SELECT * FROM repmgr_test.repl_nodes ORDER BY id;
+Depois de iniciar o slave, a tabela de repl_nodes será parecido com este:
+
+ id |  type   | upstream | cluster | name  |                  conninfo                   | slot_name 
+----+---------+----------+---------+-------+---------------------------------------------+-----------
+  1 | master  |          | test    | node1 | host=repmgr_node1 dbname=repmgr user=repmgr |           
+  2 | standby |        1 | test    | node2 | host=repmgr_node2 dbname=repmgr user=repmgr |           
+  3 | standby |        2 | test    | node3 | host=repmgr_node3 dbname=repmgr user=repmgr |           
+(3 rows)
+

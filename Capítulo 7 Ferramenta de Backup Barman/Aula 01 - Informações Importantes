@@ -1,0 +1,24 @@
+O Barman (Backup and Recovery Manager) é uma ferramenta de administração de código aberto para a recuperação de desastres de servidores PostgreSQL escritos em Python.
+
+Ele permite realizar backups remotos de vários servidores em ambientes críticos,sendo uma ótima estratégia negócios para sua empresa. Os recursos mais requisitados do barman incluem catálogos de backup, políticas de retenção, recuperação remota, arquivamento e compactação de arquivos do WAL e backups.
+
+A ferramenta barman possui as seguintes características:
+
+Backup físico completo a quente de um servidor PostgreSQL.
+Gerenciamento de vários servidores PostgreSQL.
+Recuperação remota e local de backup para um servidor PostgreSQL.
+Suporte ssh para operações remotas.
+Status e informações do servidor.
+Compressão de arquivos WAL (bzip2, gzip ou personalizado).
+Integração com ferramentas de arquivamento padrão (por exemplo, tar).
+Pré/pós backup de scripts de gancho.
+Arquivo de configuração INI simples.
+Point-In-Time-Recovery (PITR).
+Backup remoto de um servidor PostgreSQL.
+Gestão de backups de base e arquivos do WAL através de um catálogo.
+Gestão de políticas de retenção para backups e arquivos de WAL.
+Remanejamento de PGDATA e espaços de tabela no momento da recuperação.
+Geral e do disco informações sobre o uso de backups.
+Diagnósticos servidor para backup.
+Suporte a rsync sobre ssh para sincronização de arquivos e transferências.
+Documentação oficial: http://docs.pgbarman.org/release/1.6.0/

@@ -1,0 +1,38 @@
+Índices são estruturas associadas a uma ou mais colunas de uma tabela com intenção de tornar buscas mais eficientes. Eles são criados implicitamente durante a criação de tabelas para a chave primaria, se definida ou quando criada, porém nem sempre são suficientes para tornar as buscas mais eficientes. Cabe ao DBA/AD identificar quais colunas precisão ou não de índices, e qual o tipo de índice deve ser utilizado.
+
+Dentro do PostgreSQL é possível criar índices de tipos diferentes, os tipos atualmente disponíveis são:
+
+BTREE
+O índice BTREE classifica as informações sempre que possuírem os seguintes operadores: <, <=, =, >=, >.  Também para LIKE e ~ quando não ancorado no início da String.
+
+Ex.: LIKE ‘bar%’ ou ~ ‘^bar’
+
+HASH
+Os índices hash só pode lidar com comparações de igualdade simples. O planejador de consulta irá considerar o uso de um índice hash sempre que uma coluna indexada está envolvida em uma comparação utilizando o operador =, porém seu uso não é indicado e deve ser usado em seu lugar o BTREE ou BRIN.
+
+BRIN
+Índices BRIN (uma abreviação para índices Bloco Range) armazenam resumos sobre os valores armazenados em intervalos de blocos. Como GiST, SP-GIST e GIN, BRIN pode suportar muitas estratégias de indexação diferentes, e os operadores particulares com as quais um índice de BRIN podem ser utilizados variam de acordo com a estratégia de indexação. Para os tipos de dados que têm uma ordem de classificação linear, os dados indexada corresponde aos valores mínimo e máximo dos valores na coluna para cada faixa de bloco, que suporta consultas indexados usando esses operadores: <, <=, =, >=, >.
+
+GIST
+Índices GiST não são um único tipo de índice, mas sim uma infra-estrutura dentro da qual muitas estratégias de indexação diferentes podem ser implementadas. Deste modo, os operadores particulares com as quais um índice de GIST podem ser usados variam de acordo com a estratégia de indexação (a classe de operador). Como exemplo, a distribuição padrão do PostgreSQL inclui classes de operadores GiST para vários tipos de dados geométricas bidimensionais, que suportam consultas indexados usando esses operadores: <<, &<, &>, >>, <<|, &<|, |&>, |>>, @>, @<, ~=, &&
+
+GIN
+Índices GIN  são invertidos e podem lidar com valores que contêm mais do que uma chave, por exemplo matrizes. Como GIST e SP-GiST, GIN pode suportar muitas estratégias de indexação definidos pelo utilizador diferentes e os operadores particulares com as quais um índice GIN podem ser utilizados variam de acordo com a estratégia de indexação. Como exemplo, a distribuição padrão do PostgreSQL inclui classes de operadores Gin para matrizes unidimensionais, que suportam consultas indexados usando esses operadores: <@, @>, =, &&
+
+SP-GIST
+SP-GIST permite implementação de uma vasta gama de diferentes estruturas de dados baseadas em disco não-equilibradas, como quadtrees, árvores k-d, e árvores de raíz (tentativas). Como exemplo, a distribuição padrão do PostgreSQL inclui classes de operadores SP-GIST para pontos bidimensionais, que suportam consultas indexados usando esses operadores: <<, >>, ~=, <@, <^, >^
+
+ 
+
+Nota: O uso indiscriminado de índices normalmente traz efeito contrário do que se espera, índices só devem ser criados quando realmente comprovado que serão utilizados nas consultas e terão diferença significativa, pois cada índice criado gera um pequeno aumento de carga durante a escrita, além de criar mais um objeto que deve ser mantido pelo SGBD e pelo DBA.
+
+Documentação Oficial – Criação de Índices: http://www.postgresql.org/docs/9.5/static/sql-createindex.html
+Documentação Oficial – Tipos de Índices: http://www.postgresql.org/docs/9.5/static/indexes-types.html
+Documentação Oficial – Índices Parciais: http://www.postgresql.org/docs/9.5/static/indexes-partial.html
+Documentação Oficial – Índices Ordenados: http://www.postgresql.org/docs/9.5/static/indexes-ordering.html
+Documentação Oficial – Índices com Expressão: http://www.postgresql.org/docs/9.5/static/indexes-expressional.html
+Documentação Oficial – Índices Únicos: http://www.postgresql.org/docs/9.5/static/indexes-unique.html
+Documentação Oficial – Índices Compostos: http://www.postgresql.org/docs/9.5/static/indexes-multicolumn.html
+Documentação Oficial – Índices Bitmap: http://www.postgresql.org/docs/9.5/static/indexes-bitmap-scans.html
+
+

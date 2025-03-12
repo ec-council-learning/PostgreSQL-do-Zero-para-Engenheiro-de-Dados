@@ -1,0 +1,9 @@
+A partir da versão 9.1 do PostgreSQL foi introduzido o recurso de replicação síncrona, que consiste no mesmo tipo de replicação do “hot-standby”, porém neste caso o master e o slave sempre serão idênticos, não havendo nenhum tipo de atraso entre os servidores.
+
+Ao decidir por utilizar a replicação síncrona deve-se verificar a real necessidade, pois seu uso afeta o desempenho do banco, devido a necessidade do master aguardar pela efetivação no slave. O tempo de mínimo de uma transação será o tempo para gravar os dados no master somado com o tempo gasto para trafegar na rede somado com o tempo de gravação no slave.
+
+A replicação síncrona pode ser uma necessidade em alguns casos, porém na maioria dos casos a replicação assíncrona atende sem problemas. O uso do modo síncrono possui a desvantagem de que se acontecer uma parada no slave, o master também ficará parado. E sempre deve-se usar a réplica síncrona em servidores próximos, diminuindo assim o tempo de latência.
+
+A alteração do parâmetro synchronous_standby_names pode ser feito a quente, bastando somente um reload para começar a valer.
+
+ 

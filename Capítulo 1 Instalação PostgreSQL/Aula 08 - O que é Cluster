@@ -1,0 +1,39 @@
+Cluster
+Para o PostgreSQL, um cluster é um algomerado de banco de dados que ficam localizados em um diretório. Por padrão, sempre que o PostgreSQL é instalado ele cria um cluster em um diretório padrão, dependendo do SO.
+
+ 
+
+Debian e seus derivados
+Neste SO, os arquivos de configurações como pg_hba.conf, postgresql.conf entre outros ficam localizados no diretório  /etc/postgresql/version/main/, onde version significada qual a versão do PostgreSQL está instalada, e main representa o cluster, a qual se refere esses arquivos. Cada diretório possui seus próprios arquivos de configuração.
+
+Ex.: /etc/postgresql/9.4/main/  ou  /etc/postgresql/9.5/main/
+
+Já o Cluster, ou seja, o local onde fica os databases ficam localizados no diretório /var/lib/postgresql/version/main/, onde version significa qual a versão do PostgreSQL. O main representa o nome do cluster. Por padrão, no Debian o primeiro cluster criado sempre recebe o nome main.
+
+Ex.: /var/lib/postgresql/9.5/main/  ou  /var/lib/postgresql/9.5/data/
+
+Neste exemplo acima, existem dois clusteres de PostgreSQL na versão 9.5 com os nomes main e data, cada um com seus próprios databases e com suas próprias configurações.
+
+Os binários do PostgreSQL, que são usados para administrar o banco de dados ficam localizados no diretório /usr/lib/postgresql/version/bin/, onde version significa a versão do PostgreSQL. Cada binário somente deve ser usado no cluster de mesma versão, ou seja, o binário da versão 9.5 somente deve ser usado para um cluster que seja da mesma versão, no caso 9.5.
+
+Ex.: /usr/lib/postgresql/9.5/bin/ usar sempre para o cluster  /var/lib/postgresql/9.5/*
+
+ 
+
+Redhat, CentOS e seus derivados
+Neste SO, os arquivos de configuração e o cluster ficam localizados no mesmo diretório, que por padrão chama-se data, sendo localizado no diretório /var/lib/pgsql/version/data, onde version significa a versão do PostgreSQL e data o nome do cluster.
+
+Os binários do PostgreSQL, que são usados para administrar o banco de dados ficam localizados no diretório /usr/pgsql-9.5/bin/, onde pgsql-9.5 significa a versão do PostgreSQL. Cada binário somente deve ser usado no cluster de mesma versão, ou seja, o binário da versão 9.5 somente deve ser usado para um cluster que seja da mesma versão, no caso 9.5.
+
+ 
+
+Troca de Diretório e Permissão
+É muito comum haver a necessidade de trocar os diretórios padrões por outros caminhos, essa ação pode ser feita alterando os parâmetros do postgresql.conf, os parâmetros abaixo podem ser alterados para mudar o local padrão.
+
+data_directory = ‘/var/lib/postgresql/9.4/main’ – Local onde se encontra o cluster
+hba_file = ‘/etc/postgresql/9.4/main/pg_hba.conf’ – Local onde se encontra o pg_hba.conf
+ident_file = ‘/etc/postgresql/9.4/main/pg_ident.conf’ – Local onde se encontra o pg_ident.conf
+external_pid_file = ‘/var/run/postgresql/9.4-main.pid’ – Local onde se armazena o arquivo de lock, usado para identificar se o PostgreSQL está ou não executando. Normalmente não é alterado.
+Ao trocar o diretório padrão é necessário que o novo diretório tenha as permissões corretas para o funcionamento do PostgreSQL, o que inclui que o diretório deve ter como DONO o usuário postgres e o grupo postgres, e o permissionamento deve ser definido como 0700, onde somente o usuário/grupo postgres tenham permissão de ler, escrever, e executar. Dessa forma, evita-se expor os dados do cluster a usuários e grupos não autorizados.
+
+As alterações dos parâmetros acima, requerem que o PostgreSQL seja reiniciado para começar a valer os novos valores.

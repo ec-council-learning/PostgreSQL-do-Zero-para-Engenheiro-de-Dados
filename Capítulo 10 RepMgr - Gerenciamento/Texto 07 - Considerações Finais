@@ -1,0 +1,17 @@
+Chegamos ao fim do nosso curso PostgreSQL Replicação, neste curso você aprendeu de forma simples e fácil a fazer replicações no PostgreSQL em um ambiente Linux. Para que seu aprendizado aumente a cada dia, é necessário que haja uma prática contínua para o aperfeiçoamento do que foi aprendido em aula. Lembrando que sempre que houver dúvidas ou dificuldades você pode contar com a documentação ou pedir ajuda a comunidade, e para dar continuidade em sua formação faça o próximo curso de PostgreSQL e aumente ainda mais seus conhecimentos.
+
+Fórum – Utilize o fórum para ajudar e pedir ajuda a outros alunos.
+Testes – Os testes são obrigatórios, e devem ser respondidos para a conclusão do curso e liberação de certificado. Os testes testam seu conhecimento teórico sobre o PostgreSQL.
+Tarefas – As tarefas são obrigatórias, e devem ser feitas para a conclusão do curso e liberação de certificado. As tarefas foram elaboradas para simular as situações mais comuns no dia a dia, e havendo dúvidas ou dificuldades existem vários meios de ajuda que incluem: documentação original, comunidade, vídeos, textos e o fórum que serão os melhores aliados.
+Comentários – Depois de concluído o curso, solicitamos que deixe seu comentário e sua avaliação do curso.
+Certificado – O certificado, somente, será enviado se for feito a solicitação. E o mesmo só será liberado após o aluno passar por todas as tarefas e testes propostos.
+Neste curso você ficou apto:
+
+Fazer replicação síncrona e assíncrona
+Diferenças entre replicação Log Shipping e Streaming Replication
+Réplicas em cascatas e slot de replicação
+Switchover e Failover com repmgr
+Uso do pg_rewind
+Fazer Failback
+Preparar uma testemunha
+Usar o daemon do repmgr

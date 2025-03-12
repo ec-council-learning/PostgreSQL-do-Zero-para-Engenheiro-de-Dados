@@ -1,0 +1,25 @@
+O banco de dados é o coração da empresa, sem seu banco de dados a empresa não existe. Por isso, é extremamente importante que haja uma política de backup válida. Um agendamento diário, semanal ou mensal tudo conforme as regras da empresa. O PostgreSQL oferece diversas formsa de fazer um backup de seus dados. Backups pontuais são aqueles que guardam as informações no momento em que foram criados. Imagine que, num ambiente de produção, dados são inseridos, alterados e removidos o tempo todo dos bancos de dados. Portanto, um backup pontual permitirá ao administrador recuperar os dados em um ponto no passado, quando o backup foi executado.
+
+Backup Pontual de Database - pg_dump
+Exporta somente um database escolhido.
+Permite a exportação de objetos específicos, como tabelas e schemas.
+Gera um arquivo com aglomerado de comandos SQL que recriam o database.
+O arquivo tende a ficar entre 10% a 50% menor que o database.
+Não exporta role (usuário e regras) e tablespaces.
+Pode ser feito com os usuários trabalhando.
+Backup Pontual de Cluster - pg_dumpall
+Exporta todo o cluster, como databases, roles, tablespaces, functions e etc.
+Gera um arquivo com aglomerado de comando SQL que recriam o database.
+O arquivo tende a ficar entre 10% a 50% menor que o database.
+Exporta role (usuário e regras) e tablespaces.
+Pode ser feito com os usuários trabalhando.
+Backup Point-in-Time-Recovery
+Permite voltar no tempo
+Backup incremental
+Tanto o pg_dump quanto o pg_dumpall permitem exportar os dados de forma paralelizada com a utilização do parâmetro -j, de forma, a deixar o backup mais rápido.
+
+Não existem muitas diferenças significativas entre o backup pontual de database e o backup pontual de cluster. A principal diferença está relacionada entre a exportação de roles e tablespaces. Por padrão, uma tablespace e um usuário fazem parte do cluster e não de um database. É possível exportar pelo pg_dumpall somente as roles ou tablespaces utilizando um do seus parâmetros.
+
+Lembre-se que ao fazer um backup, haverá um maior uso de recursos de disco para escrita do backup, por isso, é sempre adequado fazer o backup em horário de pouco uso do ambiente, para que não haja impacto para os usuários.
+
+Obs.: Os diretórios onde residem as tablespaces devem existir antes da recuperação, na mesma localização original.

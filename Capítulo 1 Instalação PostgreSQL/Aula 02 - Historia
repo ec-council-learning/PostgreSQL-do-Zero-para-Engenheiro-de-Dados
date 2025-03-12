@@ -1,0 +1,52 @@
+Tudo começou como INGRES
+Em 1973 estava começando o projeto System R da IBM, quando dois cientistas da Universidade da Califórnia Berkeley, Michael Stonebraker e Eugene Wong, interessaram-se pelo projeto e decidiram por eles mesmos desenhar um sistema de bancos de dados relacionais.
+
+O grupo de economia de Berkeley precisava de um sistema de dados geográficos que deveria se chamar INGRES – INteractive Graphics REtrieval System. Havia disponibilidade de fundos para o financiamento desse projeto, portanto Stonebraker e Wong puderam utilizar esses recursos para criar seu projeto relacional.
+
+Para aumentar os recursos, foram procuradas a DARPA (que financiou o projeto de rede que se tornou, mais tarde, a Internet que conhecemos hoje) e o ONR – Departamento de Pesquisa Naval dos Estados Unidos. Como ambos já estavam financiando outros projetos de bancos de dados relacionais, Stonebraker teve de apresentar seus rascunhos a outras agências.
+
+Alguns poucos fundos foram levantados, isso permitiu que o projeto caminhasse através da contribuição de alguns estudantes, sendo que a primeira versão do INGRES foi disponibilizada em 1974, já com uma pequena comunidade de usuários e manutenção do código fonte. Apesar de seguir os conceitos e premissas do System R de grande porte da IBM, o INGRES era primordialmente usado no Unix para máquinas DEC.
+
+Os Derivados
+O INGRES era vendido em código fonte, disponível em fitas por uma pequena taxa. Em torno de 1.000 cópias circulavam principalmente em universidades. Vários bancos de dados comerciais utilizaram em seu princípio partes do código do INGRES, principalmente por causa dos estudantes que participaram do projeto original em Berkeley e que se juntaram ou fundaram as companhias que os desenvolveram:
+
+Início dos anos 80, Tandem Computers – Non-Stop SQL
+Meados dos anos 80, Sybase Corporation – Sybase
+Em a Microsoft licenciou alguns produtos Sybase – SQL Server
+Em 1997 a Informix adquiriu os demais direitos – Sybase
+Em 2000 a IBM tornou-se proprietária da Informix – Sybase
+Projeto Postgres
+Em 1986, Michael Stonebraker conseguiu recursos da DARPA, NSF e ESL Inc., dando início ao projeto POSTGRES na Universidade da Califórnia em Berkeley.
+
+Basicamente o projeto deveria suprir as principais deficiências do INGRES à época, como falta de tipos definidos pelo usuário, a crescente necessidade de uso de armazenamento em massa e suporte à orientação a objetos. O projeto definiu ainda a capacidade de integridade referencial, que era até então implementada pelos usuários, e a utilização de regras.
+
+O nome POSTGRES vem da abreviatura de Post INGRES – pós-INGRES.
+
+Alguns marcos do POSTGRES:
+
+1987 – Primeiro demo operacional.
+1988 – Primeira demonstração pública.
+1989 – Primeira liberação para usuários externos.
+1990 – Redesenho do sistema de regras e lançamento da versão 2.
+1992 – Redesenho do sistema de regras, suporte a múltiplos gerenciadores de armazenamento, executor de consultas otimizado, lançamento da versão 3.
+1993 – Lançamento da versão 4.2. Duplicação da comunidade externa. O foco do projeto desviou da pesquisa para a manutenção do código. Berkeley declarou oficialmente o encerramento do projeto.
+Postgres95, um divisor de águas
+Em 1994 foi adicionado o interpretador da linguagem SQL ao POSTGRES, que até então possuía uma linguagem própria de consultas chamada PostQUEL. Rebatizado como Postgres95, o novo projeto foi lançado na Internet como descendente em software livre do POSTGRES de Berkeley. Entre as principais novidades do Postgres95 1.0.x estavam a integração no código do servidor de várias capacidades previstas na linguagem SQL que até então tinham de ser implementadas pelos usuários, como o uso de GROUP BY.
+
+Foi criada a ferramenta psql utilizando a biblioteca GNU Readline. O código teve a performance otimizada, foi reduzido em 25%, teve vários bugs corrigidos, era completamente ANSI-C e podia ser compilado com o GCC sem nenhum patch.
+
+Finalmente, PostgreSQL
+Era óbvio que o nome Postgres95 não iria resistir ao tempo, foi então rebatizado como PostgreSQL em 1996.
+
+Muitos usuários carinhosamente ainda o chamam por Postgres, talvez pela herança do nome original e facilidade da pronúncia. A comunidade aceita ambas as denominações PostgreSQL e Postgres, é assim que pode ser escrito.
+
+Atualmente
+O PostgreSQL, hoje, encontra-se em sua versão 9.5, trazendo consigo muitas novas features e melhorias.
+
+Full Text Search
+Foreign Data Wrapper
+Tipos JSON e JSONB
+Windows Functions
+Entre vários outros, consulte o manual PostgreSQL
+
+

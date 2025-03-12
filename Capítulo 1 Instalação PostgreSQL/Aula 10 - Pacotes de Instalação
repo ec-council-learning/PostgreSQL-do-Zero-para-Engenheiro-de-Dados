@@ -1,0 +1,38 @@
+Qual pacote utilizar
+Muitos usuários do PostgreSQL têm dúvidas com relação a qual pacote utilizar: o pacote do distribuidor do sistema operacional, o pacote da comunidade PostgreSQL ou compilar diretamente. Essa resposta depende de uma série de fatores, mas é tipicamente uma decisão bem simples.
+
+Pacote do SO – Ao instalar o pacote fornecido diretamente com seu sistema operacional, as seguintes características estão presentes:
+
+Está prontinho para instalar, costuma ser a forma mais fácil e rápida. Depende apenas das instruções do fornecedor do sistema operacional que costuma ser conhecida pelos administradores do ambiente.
+As flags utilizadas na compilação geralmente são as default.
+Em alguns casos, o fornecedor do sistema operacional ou a comunidade que a produz possui um suporte próprio para o pacote do PostgreSQL disponibilizado, o que pode constituir uma vantagem.
+Todo sistema operacional possui uma estrutura de diretórios definida por seus desenvolvedores. Os pacotes do PostgreSQL fornecidos para o sistema operacional costumam seguir essas linhas.
+A versão do PostgreSQL será fixada pelo fornecedor ou comunidade. A maioria delas costuma oferecer as atualizações minoritárias do PostgreSQL, mas nem sempre isso é verdade.
+Se alguma funcionalidade estiver presente apenas em uma versão majoritária mais recente que a disponibilizada, ela não estará disponível.
+Pacote Comunidade – A comunidade PostgreSQL oferece pacotes no site www.postgresql.org. As seguintes características estão presentes:
+
+Não estão disponíveis para todos os S.O. ou todas as variantes e versões do S.O.
+Para distribuições GNU/Linux estão disponíveis repositórios para apt e yum, distribuições recentes baseadas em Debian e Red Hat, respectivamente. Os repositórios são completos e disponibilizam todas as versões suportadas do PostgreSQL, bem como módulos contrib e outras ferramentas acessórias em versões atuais como o PgAdmin 3, Slony, etc.
+Existe o one-click installer para Linux disponibilizado pela empresa EnterpriseDB. O one-click installer, instala o PostgreSQL no diretório /opt e é compatível com a maioria das distribuições recentes.
+Para alguns sistemas operacionais, os pacotes disponíveis na comunidade são a única opção disponível, como Windows e Mac OS X.
+Os pacotes da comunidade tem suporte pelos meios oficiais da comunidade PostgreSQL como a documentação, FAQ, listas de discussão e wiki.
+São compiladas com as flags padrões, definidas pela comunidade.
+Compilação – Ao compilar o PostgreSQL diretamente:
+
+Existe um maior grau de dificuldade exigindo, em alguns casos, conhecimentos de desenvolvimento.
+A compilação em distribuições GNU/Linux é relativamente simples, pois é o sistema operacional usado pela maior parte dos desenvolvedores do PostgreSQL, sendo um procedimento bem testado.
+A compilação em outros sistemas operacionais pode exigir o uso de compilador próprio, que pode ou não precisar de flags específicas ou ajustes em variáveis de ambiente.
+É necessária a presença do compilador C e código fonte das bibliotecas necessárias zlib e libreadline. Em alguns ambientes, a política da empresa não permite a presença dessas ferramentas nas máquinas de produção. Compilar numa outra máquina e gerar um pacote próprio para seu sistema operacional é possível, de forma que esse pacote gerado será instalado em produção.
+É possível customizar totalmente os executáveis, utilizando flags que podem otimizar o ambiente ou ativar funções específicas de produção ou monitoramento.
+Compilando o PostgreSQL, a atualização entre versões minoritárias poderá ser executada assim que for lançada, não sendo necessário aguardar a disponibilização por parte de terceiros.
+Para decidir, os seguintes passos podem ser seguidos:
+
+Prefira o pacote do fornecedor do sistema operacional se estiver disponível, atender às suas necessidades e ao menos a versão minoritária for disponibilizada pelo fornecedor.
+Se seu fornecedor não oferece o pacote, for muito antigo para o ambiente ou as atualizações minoritárias não são garantidas, procure utilizar os repositórios ou pacotes da comunidade.
+Será necessário compilar o PostrgreSQL quando:
+
+O fornecedor do sistema operacional não oferece o pacote, o pacote disponível não está na versão que você precisa ou é muito antigo.
+Não há pacote da comunidade pronto para seu S.O.
+Precisa alterar flags de compilação (em algumas distribuições GNU/Linux você pode fazer isso com pacotes código fonte da própria distribuição).
+Você precisa alterar o código fonte.
+Em resumo, prefira sempre os pacotes do fornecedor do S.O. ou através de pacotes da comunidade. Faça a compilação somente quando não houver outra opção, e só for compilar só altere o código fonte se você souber o que realmente está sendo feito, uma mudança incorreta pode levar seus dados a serem perdidos para sempre.

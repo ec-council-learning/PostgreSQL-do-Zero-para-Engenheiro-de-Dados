@@ -1,0 +1,15 @@
+Usando um servidor testemunha com repmgrd
+
+Em uma situação causada por exemplo por uma interrupção de rede entre dois centros de dados, é importante para evitar uma situação de "split-brain", onde ambos os lados da rede assumem que são o segmento master e o lado sem um master ativo promove unilateralmente uma de seus slaves.
+
+Para evitar que essa situação aconteça, é essencial garantir que um segmento de rede tem uma "maioria de voto", por isso, outros segmentos irão saber que eles estão em minoria e não tentam promover um novo master. Onde um número ímpar de servidores existente, este não é um problema. No entanto, se cada rede tem um número par de nós, é necessário fornecer alguma forma de garantir uma maioria, que é onde o servidor testemunha torna-se útil.
+
+Este não é um nó slave e não está integrado na replicação, mas ele efetivamente representa o "voto de qualidade" ao decidir qual segmento de rede tem uma maioria. Um servidor testemunha pode ser configurado usando o comando repmgr witness create e pode ser executado em um servidor dedicado ou um nó existente.
+
+Cria um servidor testemunha como uma instância separada do PostgreSQL. Esta instância pode estar em um servidor separado ou um servidor existente. O servidor testemunha conter uma cópia das tabelas de metadados repmgr, mas não será configurado como slave, em vez disso, irá atualizar seus metadados a cada vez que ocorrer um failover.
+
+O comando repmgr witness create requer um arquivo repmgr.conf contendo o parâmetro conninfo válido para o servidor a ser criado, bem como os outros parâmetros mínimos exigidos no repmgr. Por padrão, o servidor testemunha usará a porta 5499 para facilitar sua configuração em um servidor com um nó existente. Para usar uma porta diferente, deve fornecer isso explicitamente na arquivo repmgr.conf dentro do conninfo. Também, requer a localização do diretório de dados do servidor testemunha  (-D/--datadir), bem como os parâmetros de conexão válidos para o servidor master.
+
+Por padrão, este comando irá criar um super-usuário e um usuário repmgr. O nome de usuário repmgr será extraído a partir do arquivo repmgr.conf do parâmetro conninfo.
+
+Note-se que só faz sentido criar um servidor testemunha em conjunto com o funcionamento de repmgrd, o servidor testemunha exigirá sua própria instância repmgrd.

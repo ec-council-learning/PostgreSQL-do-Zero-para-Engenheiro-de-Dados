@@ -1,0 +1,101 @@
+Dentro de um servidor de banco de dados, uma das maiores preocupações deve ser a segurança. Caso sua base de dados seja acessada indevidamente, seus dados podem estar comprometidos e isso pode gerar prejuízos e até mesmo causar o fechamento da empresa. Lembre-se a base de dados é o coração da empresa. Por este motivo, é extremamente importante que a base de dados somente seja acessada por pessoal autorizado.
+
+Além da segurança de acesso no sistema operacional do banco de dados, é ideal que usuário que acessem a base de dados também passem por restrições e bloqueios que não os permitem alterar, inserir ou excluir qualquer informação que não seja de sua responsabilidade. Imagine um usuário comum que tem podem de acessar uma base de dados e visualizar o salário de todos os funcionários, ou pior que tenha permissão de alterá-los. Como forma de segurança é ideal que seja criado permissões e privilégios para cada usuário que acesse a base de dados.
+
+Autenticação e gerenciamento de usuários
+
+Lembrando sempre da disponibilidade e segurança dos dados, uma correta administração dos usuários e grupos, seus privilégios de acesso e métodos de autenticação é um dos fatores mais importantes para os bancos de dados.
+
+Papéis e usuários
+Concessão de privilégios
+Arquivo de autenticação pg_hba.conf
+Papéis e usuários
+
+Usuários e grupos no PostgreSQL são igualmente chamados de roles – papéis. Essa mistura, que a princípio pode causar muita confusão, na verdade facilita bastante a administração de bancos de dados, uma vez que usuários podem fazer parte de grupos e os comandos utilizados para designar privilégios são praticamente os mesmos para ambos.
+
+Um dos catálogos de sistema, interessante para a administração de papéis, é o pg_roles. Um comando SQL que permite ver todos os papéis cadastrados seria: SELECT rolname FROM pg_roles;
+
+Comandos SQL podem ser digitados em qualquer ferramenta que se conecta ao PostgreSQL, inclusive o psql e o pgAdmin 3. O psql possui um conjunto de meta comandos, o meta comando para visualizar papéis é '\du' (sem aspas).
+
+Papéis de usuário
+Para criar usuários pode-se utilizar o comando genérico para a criação de papéis adicionando a palavra LOGIN no final: CREATE ROLE [nome] LOGIN;   ou  CREATE USER [nome];
+Ambos os comandos acima têm a mesma função e vão fazer a mesma coisa.
+
+As opções para os comandos CREATE ROLE e CREATE USER são as seguintes:
+
+SUPERUSER  - Fará com que o papel criado seja de superusuário.
+CREATEROLE  - Permitirá que o papel possa criar novos papéis.
+CREATEDB  - Permitirá que o papel possa criar novos bancos de dados.
+REPLICATION - Permitirá que o papel possa iniciar replicação através de streaming replication ou fazer um backup inicial com pg_basebackup.
+Somente superusuários podem criar novos superusuários!
+
+Papéis de superusuário podem fazer qualquer coisa, inclusive criar novos papéis e bancos de dados, independente de terem sido criados com CREATEROLE ou CREATEDB. Ao se retirar a opção SUPERUSER de um papel, as opções CREATEROLE e CREATEDB voltam a ser obedecidas, ou seja, é possível determinar um superusuário temporariamente sem alterar as demais permissões do papel.
+
+Lembre-se sempre de criar usuários específicos para cada tarefa, e um usuário que seja dono de um objeto terá total poder sobre o objeto o qual ele é dono. Então criar usuários comuns e deixá-los como dono de uma base de dados por ser uma opção, mas o ideal e que cada usuário tenha privilégios específicos dentro da base de dados, afim que somente possam acessar áreas definidas dentro daquela base de dados.
+
+O Arquivo de Autenticação: pg_hba.conf
+
+Para quê serve o pg_hba.conf - Como visto anteriormente nas permissões, é possível designar restrições e liberações específicas por usuário para praticamente tudo dentro do cluster do PostgreSQL.
+O arquivo pg_hba.conf, acrônimo de Host-Based Authentication – autenticação baseada em host, tem como função limitar os acessos antes mesmo que algum tipo de conexão seja feita ao cluster.
+
+Em tempos de segurança em TI, evitar que conexões sejam feitas pode prevenir ataques de força bruta, pois se todo o controle de acesso fosse feito internamente ao servidor, recursos demais já estariam sendo consumidos. Um arquivo de autenticação bem escrito poderá evitar esse tipo de ataque ou minimizar suas consequências. Com o pg_hba.conf pode-se definir quais usuários se conectarão, a quais bancos de dados, de quais hosts e qual método de autenticação poderá ser usado.
+
+O pg_hba.conf contém uma lista de registros (um registro por linha) com cinco colunas, divididos em espaços ou paradas de tabulação. A lista tem precedência, ou seja, ela será lida de cima para baixo, em ordem, e a primeira linha que contiver a combinação correta de tipo de conexão, banco de dados, usuário e hostname será lida, sendo descartadas as linhas abaixo. O método de autenticação indicado será utilizado.
+
+Em um conjunto de autenticações misto, é melhor colocar:
+
+Formas de conexão mais amarradas e métodos mais relaxados primeiro.
+Formas de conexão mais relaxadas e métodos mais seguros depois.
+Alterações no pg_hba.conf estarão aplicadas após o servidor receber um reload.
+
+Coluna TYPE - Representa o tipo de conexão utilizada deste registro. Os valores possíveis são listados a seguir.
+local - Conexão por Unix Domain Sockets, ou seja, conexão por socket do sistema operacional, sem o uso de rede ou da interface loopback (localhost). O psql tentará se conecta por socket local se não for especificada a opção -h. Os aplicativos baseados em libpq têm o mesmo comportamento. Se nenhuma linha do pg_hba.conf contiver esta valor, a conexão por socket será totalmente desativada.
+host - Conexão usando TCP/IP remota ou local. Conexões não criptografadas ou criptografadas por SSL serão igualmente aceitas. Conexões locais serão aceitas pela interface loopback com o hostname localhost ou pelo IP 127.0.0.1, observado o arquivo hosts do sistema operacional.
+hostssl - Similar à opção host, porém só aceitará conexões criptografadas SSL. O PostgreSQL aceita todas as opções de cifras da biblioteca OpenSSL. Os arquivos de certificados devem estar na raiz diretório do cluster.
+hostnossl - Exatamente o oposto de hostssl. Somente conexões não criptografadas serão aceitas.
+Coluna DATABASE - Nesta coluna pode-se especificar a qual banco de dados se referirá esta linha.
+Especificar diretamente o nome do banco de dados, pode-se separar múltiplos valores por vírgulas;
+Utilizar o valor “all”, que representará todos os bancos de dados do cluster;
+Utilizar o valor “sameuser”, que representará que as tentativas de conexão serão aceitas para usuários conectando-se ao mesmo banco de dados que tiver seu nome;
+Utilizar o valor “samerole”, que representará que as tentativas de conexão serão aceitas para usuários conectando-se a um banco de dados que tenha o mesmo nome que um papel de grupo do qual faça parte.
+Especificar um arquivo à parte, com uma lista de valores, utilizando o caracter “@” seguido do nome do arquivo, sem espaços os separando.
+Coluna USER - Nesta coluna pode-se especificar a qual usuário refere-se a linha.
+Especificar diretamente o nome do usuário, separando múltiplos valores por vírgulas;
+Especificar um papel de grupo, precedido pelo caractere “+”, sem espaço; todos os usuários pertencentes ao grupo poderão se valer de tentativas de conexão;
+Especificar um arquivo com lista de valores, utilizando o caractere “@” precedendo o nome do arquivo, sem espaços os separando.
+Coluna CIDR-ADDRESS
+Esta é a única coluna que pode conter de zero a dois valores separados por espaço, sendo aceitas.
+Para linhas do tipo local, este campo não deve ser especificado (nenhum valor na coluna, coluna ignorada)
+Para registros host, hostssl e hostnossl, este campo pode conter:
+Endereços tipo CIDR-address (um valor na coluna), por exemplo:
+172.20.143.89/32 um único host
+172.20.143.0/24 rede pequena
+10.6.0.0/16 rede grande
+201.0.0.0/8 internet, todos os IPs começando por 201
+0.0.0.0/0 toda a internet
+172.20.143.89 255.255.255.255 um único host
+172.20.143.0 255.255.255.0 rede pequena
+10.6.0.0 255.255.0.0 rede grande
+201.0.0.0 255.0.0.0 internet, todos os IPs começando por 201
+0.0.0.0 0.0.0.0 toda a internet
+A máscara deve ser de 32 bits para endereços IPV4 ou 128 bits para IPV6. Se a rede contiver endereços IPV4 e IPV6, um registro deve ser adicionado para cada uma delas. Se somente o endereço IPV6 for especificado, mesmo com um equivalente IPV4, a conexão IPV4 será recusada.
+
+Observe que o PostgreSQL depende da biblioteca C e do kernel do sistema operacional utilizado. O suporte IPV6 existirá somente se disponível pelo sistema operacional.
+
+Coluna METHOD - Quando a tentativa de conexão coincidir com toda a combinação dos campos anteriores, o PostgreSQL utilizará o método de conexão especificado neste campo. Se este método aprovar a tentativa (como usuário e senha válidos), o usuário se conectará ao banco de dados. Caso contrário, a conexão será recusada e, como já citado acima, não haverá outras tentativas de conexão existentes no arquivo pg_hba.conf abaixo desta linha.
+trust - É o método de conexão menos seguro. Permitirá a conexão incondicional do usuário, sem solicitar senha.
+peer - O usuário que estiver tentando se conectar deve existir no sistema operacional e ser o mesmo que está tentando a conexão ao banco de dados. Funciona somente para o tipo de conexão local por socket.
+reject - Rejeitar a conexão incondicionalmente. Útil quando existe uma rede grande onde apenas alguns hosts devem ser excluídos. Método utilizado para realizar blacklist. Também utilizado quando colocado no topo do arquivo para bloquear todos os acessos ao banco de dados em caso de necessidade de manutenção.
+md5 - Uma senha deverá ser fornecida pelo usuário, o banco de dados guarda esta senha no formato MD5. A aplicação cliente é responsável por prover a criptografia (o que é feito pela libpq), ou seja, a senha viajará criptografada pela rede. É o método preferido para conexões não SSL. É o método mais usado na prática.
+password - Requer uma senha não criptografada. A senha viaja sem criptografia pela rede. Não utilize em redes não privadas e/ou sujeitas a inspeção de pacotes (sniffing). Resumindo, evite. Pode ser o método de autenticação obrigatório para o pgpool-II em alguns modos de operação.
+gss - Autenticação tipo Single Sign On com Kerberos.
+sspi - Disponível apenas quando o servidor PostgreSQL estiver rodando no Windows, permite autenticação Single Sign On com Kerberos ou NTLM, sendo Kerberos preferível quando disponível.
+krb5 - Autenticação tipo Single Sign On com Kerberos versão 5.
+ident - O usuário que estiver tentando se conectar deve existir no sistema operacional e ser o mesmo que está tentando a conexão por um servidor ident que deve existir no cliente. Este método de autenticação não pede senha, ou seja, o PostgreSQL confiará no sistema operacional e no servidor de Ident. Não se recomenda o uso de ident, pois servidores ident podem facilmente burlar regras e informar a existência de usuários fantasmas. Para conexões locais, desde a versão 9.0 deve ser utilizado o método 'peer'
+ldap - Autenticar usando um servidor LDAP. Configurações adicionais são necessárias em mais um campo.
+radius - Autenticar usando um servidor RADIUS. Configurações adicionais são necessárias em mais um campo.
+cert - Autenticar usando os certificados SSL existentes. Nenhuma senha será solicitada. A cn do certificado deve ser o nome do usuário. O cliente deve possuir o certificado válido e correspondente. O servidor deve possuir o certificado raiz da autoridade que emitiu o certificado do cliente.
+pam - Autenticar usando PAM, disponível em alguns sistemas operacionais como Linux e Solaris.
+Para os métodos baseados em Kerberos, NTLM, LDAP, RADIUS, certificados e PAM, o usuário deverá previamente existir no catálogo do PostgreSQL, e ser o mesmo do serviço externo. Apenas o par usuário/senha será verificado junto ao serviço externo para permissão de conexão.
+
+Observe sempre quais interfaces de rede estão sendo utilizadas para escuta na configuração listen_address do arquivo postgresql.conf. Se o parâmetro não estiver definindo nenhuma interface, nenhuma conexão vinda da rede será liberada.

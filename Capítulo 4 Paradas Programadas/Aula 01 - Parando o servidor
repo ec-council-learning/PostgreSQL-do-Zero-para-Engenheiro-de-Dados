@@ -1,0 +1,44 @@
+Preciso parar o PostgreSQL
+
+Não desejamos parar nossos bancos de dados nunca, mas é claro que várias situações podem requerer esta tarefa. Um SGBD como o PostgreSQL terá:
+
+Arquivos abertos – centenas ou até milhares de arquivos estão abertos em disco quando bancos de dados estão transacionando.
+Conexões de rede – sockets estão em uso, com clientes locais e/ou remotos conectados.
+Transações estão em andamento – a norma ACID prevê que as coisas comecem, acontecem e terminem, tudo isso tem um intervalo de tempo.
+Semáforos estão alocados – SGBDs multi-processos utilizam o recurso de semáforos do sistema operacional para controlar os processos que estão ocupando o tempo de CPU e a comunicação entre eles.
+Memória compartilhada está alocada – o desenho multi-processos faz com que uma área de memória esteja alocada para compartilhamento de todos os processos.
+Considerando os itens acima, ao parar o cluster todos os recursos devem ser liberados corretamente, caso contrário, o sistema operacional poderá não funcionar após uma parada do SGBD por esgotamento de recursos. O cluster pode até não conseguir mais ser inicializado. Por isso o PostrgreSQL implementa várias formas de parada: smart, fast e immediate. Também é possível utilizar os sinais de kill que estão disponíveis no Linux e toda a família Unix e derivados.
+
+Utilizando o pg_ctl
+
+O pg_ctl é a forma preferida para controlar o início e parada dos clusters PostgreSQL, pois ele implementa uma série de facilidades ao administrador como escolha dos sinais corretos nos processos corretos. O pg_ctl pode ser facilmente implementado também em scripts.
+
+Tipos de parada
+
+Parada smart - É a forma padrão de parada e também a mais segura.
+Ao receber uma solicitação de parada smart, o PostgreSQL aguardará que todas as transações correntes sejam finalizadas, todas as sessões (conexões) abertas sejam encerradas e, caso exista, um backup em andamento também será aguardado.
+
+O uso da parada smart em ambientes complexos pode ser difícil ou até impossível. Servidores de aplicação, pools de conexão, middlewares entre os usuários e o banco de dados, scripts de automação rodando e até mesmo se algum usuário deixou o psql ou pgAdmin abertos podem fazer com que o cluster não pare.
+
+Será então necessário que todas as aplicações e clientes sejam parados primeiro para que, em seguida, possa ser utilizada a parada smart.
+
+Parada fast - A parada fast é considerada agressiva, porém, ainda conserva certo grau de segurança.
+Ao receber uma solicitação de parada fast, o PostgreSQL encerrará as transações correntes com um rollback, encerrará sessões abertas e qualquer backup em andamento. Os recursos de sistema operacional como semáforos e memória compartilhada serão liberados se a parada for concluída com sucesso.
+
+Note que uma parada fast, ao enviar o rollback das transações correntes, pode fazer com que uma aplicação tenha comportamento inesperado se não estiver preparada para tal. Esteja ciente de que a aplicação foi preparada para tratar esse caso.
+
+Parada immediate - Só deve ser utilizada em último caso. A parada immediate faz tudo o que a parada fast faz, só que encerra todos os processos abruptamente, sem liberar corretamente os recursos do sistema operacional. É equivalente a uma falha catastrófica.
+Ao ser iniciado novamente, o PostgreSQL fará a releitura dos arquivos WAL presentes no diretório pg_xlog, para garantir a gravação correta de todas as transações finalizadas até o momento da parada.
+
+A parada immediate tem utilidade caso o servidor esteja passando por problemas, por exemplo, processos presos, e a parada fast não estiver funcionando. Pode ser necessário utilizar comandos do sistema operacional para liberar recursos não liberados pela parada, especialmente semáforos do Solaris.
+
+Uso do kill - Prefira sempre utilizar o pg_ctl para comandar o PostgreSQL, porém, o kill pode enviar os sinais a seguir, que terão as seguintes equivalências:
+SIGTERM – parada smart
+SIGINT – parada fast
+SIGQUIT – immediate
+SIGHUP – reload
+Os sinais de kill devem ser enviados ao processo pai postgres, nunca aos demais. Caso um sinal de kill inadequado seja enviado a um processo de conexão (backend) todo o seu cluster poderá falhar catastroficamente por corrupção da memória compartilhada.
+
+O processo postgres é o orquestrador e pai dos demais processos (que são forks dele), portanto, ele possui rotinas capazes de interpretar os sinais kill. O pg_ctl faz todo esse trabalho, por isso, prefira utilizá-lo sempre.
+
+Ao instalar o PostgreSQL a partir dos pacotes disponibilizados de forma integrada às distribuições Debian e RedHat, bem como suas derivadas, scripts especializados são disponibilizados para controlar o cluster. Prefira utilizar os scripts específicos das distribuições sempre que disponíveis e isso for possível.

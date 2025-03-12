@@ -1,0 +1,18 @@
+Em ambientes críticos uma parada inesperada pode impactar o negócio, e está é uma situação que não pode acontecer. A ferramenta Repmgr foi criada pela 2ndQuadrant com a intenção de facilitar o gerenciamento e controle dessas ações. O repmgr é um conjunto de ferramentas de código aberto para gerenciamento de replicação e failover em um cluster de servidores de PostgreSQL. Ele melhora a capacidade hot-standby do PostgreSQL com ferramentas para configurar servidores slaves, monitorar a replicação, e executar tarefas administrativas, tais como operações de failover ou switchover.
+
+Repmgr
+
+O repmgr utiliza os próprios binários do PostgreSQL para execução de algumas ações. Por este motivo, é importante que a variável de ambiente PATH esteja definida com o caminho completo do binário do PostgreSQL. Abaixo é mostrado um exemplo de adição dos binários do PostgreSQL dentro do PATH do usuário postgres.
+
+postgres@fileserver:~$ echo $PATH
+postgres@fileserver:~$ /usr/local/bin:/usr/bin:/bin
+postgres@fileserver:~$ export PATH=$PATH:/usr/lib/postgresql/9.5/bin/
+
+postgres@fileserver:~$ echo $PATH
+postgres@fileserver:~$ /usr/local/bin:/usr/bin:/bin:/usr/lib/postgresql/9.5/bin
+Porém essa alteração é temporária, e será perdida quando o usuário fizer o logoff. Para que se torne uma mudança permanente é necessário que seja adicionado dentro de um arquivo chamado .bash_profile/.bashrc dentro do diretório do usuário postgres. Para entrar dentro do diretório padrão - $HOME - do usuário, o comando cd ~ pode ser usado. Também é possível definir a localização dos binários do PostgreSQL utilizando o parâmetro pg_bindir dentro do arquivo repmgr.conf
+
+É recomendado que as máquinas estejam com troca de chaves públicas feitas e que seja instalado o pacote rsync para o envio dos dados.
+
+Site Oficial: http://repmgr.org/
+Documentação Oficial: https://github.com/2ndQuadrant/repmgr/blob/master/README.md

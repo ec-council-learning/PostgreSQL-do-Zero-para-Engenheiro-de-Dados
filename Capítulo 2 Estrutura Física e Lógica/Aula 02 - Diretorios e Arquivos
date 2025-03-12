@@ -1,0 +1,30 @@
+Dentro de um cluster PostgreSQL, existe vários arquivos e diretórios que são usados para manipular o funcionamento do banco de dados. Os diretórios e arquivos são:
+
+PG_VERSION – Arquivo que contém informações sobre a versão do PostgreSQL
+base – Diretório que contém subdiretórios dos databases, cada database possui um OID que o identifica
+global – Diretório que contém catálogo do PostgreSQL, conjunto de tabelas de uso de todo o cluster, como o pg_class
+pg_commit_ts – Diretório que contém o timestamp da finalização das transações
+pg_clog – Diretório que contém dados sobre o estado da finalização das transações
+pg_dynshmem – Diretório que contém arquivos usados no subsistema de memória compartilhada
+pg_logical – Diretório que contém status de informações logical deconding
+pg_multixact – Diretório que contém dados sobre o estado multi-transacional. Usado para shared row-locks
+pg_notify – Diretório que contém status de informações de LISTEN/NOTIFY
+pg_replslot – Diretório que contém slots de replicação
+pg_serial – Diretório que contém informações acerca de transações serializavéis
+pg_snapshots – Diretório que contém snapshots exportados
+pg_stat – Diretório que contém arquivos permanentes para estatísticas do sub-sistema
+pg_stat_tmp – Diretório que contém arquivos temporários do sub-sistema de estatísticas
+pg_subtrans – Diretório que contém dados de estado de sub-transações
+pg_tblspc – Diretório que contém links simbólicos para tablespaces
+pg_twophase – Diretório que contém arquivos de estado para prepared transactions
+pg_xlog – Contém logs de transação, chamados de arquivos WAL (Write Ahead Log)
+postgresql.auto.conf – Arquivo usado para armazenar parâmetros de configuração feito pelo comando ALTER SYSTEM
+postmaster.opts – Arquivo que contém as opções de linha de comando da última inicialização do PostgreSQL neste cluster
+postmaster.pid – Arquivo de trava que contém o PID e ID do segmento de memória compartilhada na última inicialização. Quando o cluster é desligado corretamente, este arquivo desaparece. Caso a parada tenha sido a força, como uma falha, o arquivo pode permanecer no diretório.
+Dentro de um ambiente de banco de dados PostgreSQL, normalmente não se altera os diretórios acima, sempre que houver necessidade de modificação o mesmo deve ser feito dentro do PostgreSQL e não em seus diretórios. Porém como forma de melhorar a performance do ambiente alguns diretório podem sofrer alterações.
+
+pg_stat_tmp – Este diretório possui escrita intensa. Em caso de detecção de gargalo em disco, pode-se colocá-lo em memória através de RAM Disk, seu conteúdo não precisa ser persistente, na próxima inicialização o PostgreSQL pode recriar seu conteúdo. Perde-se, as estatísticas de uso do banco de dados caso ocorra e as contagens são reiniciadas.
+pg_xlog – Este diretório possui escrita intensa. Como tuning inicial em sistemas que são OLTP, recomenda-se colocá-lo em um disco separado e exclusivo. Utilize, portanto, sempre discos confiáveis para este diretório, preferencialmente com redundância.
+Documentação Oficial: http://www.postgresql.org/docs/9.5/static/storage-file-layout.html
+
+

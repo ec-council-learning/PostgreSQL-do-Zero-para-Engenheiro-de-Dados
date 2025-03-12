@@ -1,0 +1,15 @@
+Existem diversos formatos de saída para o pg_dump/pg_dumpall os formatos custom e directory possuem algumas vantagens.
+
+Podem ser paralelizados de forma a deixar a exportação mais rápida.
+Podem ser paralelizados de forma a deixar a restauração mais rápida.
+Possuem um formato binário que dificulta a visualização dos dados do backup.
+Ocupam menos espaço em disco.
+Apesar de ser a estratégia usada por muitas empresas para armazenar suas informações de forma segura, está ainda não é a melhor forma de se fazer o backup. O backup point-in-time-recovery é a forma ideal de ser fazer um backup em um ambiente PostgreSQL.
+
+O processo de restauração de um backup pontual é simples, devendo-se usar o pg_restore somente quando for usado a formação custom, directory ou tar.
+
+Encoding
+
+O encoding define a formatação usada para armazenar os diferentes tipos de caracteres. Com o pg_dump é possível exportar o tipo de encoding desejado. É comum a aplicação enviar um encoding de um tipo e a base de dados possuir encoding de tipo diferente, gerando caracteres inválidos. A utilização do encoding UTF-8 é uma opção a ser usado, pois engloba diversos caracteres conhecidos.
+
+Documentação Oficial: http://www.postgresql.org/docs/9.5/static/multibyte.html

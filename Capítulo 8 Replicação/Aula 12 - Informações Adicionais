@@ -1,0 +1,18 @@
+O PostgreSQL também disponibiliza réplicas em cascatas desde a versão 9.1 e slot's de replicação desde a versão 9.4.
+
+Replicação em cascata
+O recurso de replicação em cascata permite que um servidor slave aceite conexões de replicação e transmita os registros WAL para outras réplicas. Isso pode ser usado para reduzir o número de conexões diretas para o master e também para minimizar as despesas gerais de largura de banda.
+
+Um slave que age como um receptor e um emissor é conhecido como slave em cascata. Slave que estão mais diretamente ligados ao master são conhecidos como servidores upstream, enquanto que os servidores slaves cascateados são servidores downstream.
+
+Se um servidor slave é promovido para se tornar novo master, servidores downstream vão continuar a transmitir a partir do novo master se recovery_target_timeline foi definido como 'latest'.
+
+Para usar a replicação em cascata, deve-se configurar o modo slave para que ele possa aceitar conexões de replicação (ou seja, max_wal_senders e hot_standby).
+
+Slot de replicação
+Slot's de replicação fornecem uma forma automatizada para garantir que o master não remova segmentos WAL até que tenham sido recebidos por todos os slaves, e que o master não remova linhas que poderiam causar um conflito de recuperação, mesmo quando a slave é desconectado.
+
+Em vez de utilizar slot's de replicação, é possível impedir a remoção de segmentos antigos de WAL utilizando wal_keep_segments, ou através do armazenamento dos segmentos em um arquivo usando archive_command. No entanto, estes métodos geralmente resultam em retenção maior de segmentos de WAL que o necessário, enquanto que slot's de replicação de mantêm apenas o número de segmentos necessários. Da mesma forma, hot_standby_feedback e vacuum_defer_cleanup_age fornecem proteção contra linhas relevantes que serão removidas por VACUUM, mas o primeiro não fornece nenhuma proteção durante qualquer período de tempo em que a slave não está ligado, e este último muitas vezes precisa ser definido para um valor elevado para garantir uma proteção adequada. Slot's de replicação superam estas desvantagens.
+
+Documentação réplicas em cascatas: http://www.postgresql.org/docs/9.5/static/warm-standby.html#CASCADING-REPLICATION
+Documentação Slot de replicação: http://www.postgresql.org/docs/9.5/static/warm-standby.html#STREAMING-REPLICATION-SLOTS

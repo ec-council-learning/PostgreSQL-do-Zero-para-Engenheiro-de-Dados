@@ -1,0 +1,10 @@
+Sempre que trabalhamos com réplicas, é importante que façamos a liberação dos usuários do tipo REPLICATION no arquivo de configuração pg_hba.conf. Conforme mostrado no vídeo PG03T01A01 - Preparando o Master o usuário do tipo REPLICATION será o responsável pela execução da replicação, e este usuário deve ter permissão de acessar o servidor corretamente. Sempre faça a liberação para todas as máquinas que serão réplicas.
+
+É muito importante que os privilégios de acesso para a replicação seja configurado de modo que somente usuários confiáveis possam ler o fluxo WAL, porque é fácil de extrair informações privilegiadas a partir dele. Slaves devem autenticar no master como um superusuário ou uma conta que tem o privilégio de replicação. Recomenda-se criar uma conta de usuário dedicada com a replicação e login com privilégios para replicação. Enquanto o privilégio REPLICATION oferece muitas permissões, ele não permite que o usuário modifique os dados no sistema master, que normalmente, o privilégio de superusuário faz.
+
+A autenticação do cliente para a replicação é controlado por uma replicação especificando o registro pg_hba.conf no campo de banco de dados (DATABASE). Por exemplo, se a espera está sendo executado no host IP 192.168.1.100 e o nome da conta para a replicação é foo, o administrador pode adicionar a seguinte linha ao arquivo pg_hba.conf no master:
+
+# TYPE  DATABASE        USER            ADDRESS                 METHOD
+host    replication     foo             192.168.1.100/32        md5
+Documentação Oficial: http://www.postgresql.org/docs/current/static/auth-pg-hba-conf.html
+Documentação preparando o Master: http://www.postgresql.org/docs/9.5/static/warm-standby.html#PREPARING-MASTER-FOR-STANDBY

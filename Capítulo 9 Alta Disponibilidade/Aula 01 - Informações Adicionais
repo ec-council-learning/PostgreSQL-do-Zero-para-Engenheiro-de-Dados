@@ -1,0 +1,26 @@
+Em um ambiente de alta disponibilidade, e comum que o servidor sofra manutenções. Sempre que o servidor master sofre manutenção um servidor slave deve assumir o trabalho neste período. Também é comum que haja programas que ficam encarregados de fazer essa troca automaticamente sempre que um master para de responder, de forma que o ambiente não fique parado.
+
+Switchover
+O switchover, em um ambiente de banco de dados, é a capacidade de um sistema de comutar manualmente para um standby quando da ocorrência de falha ou término anormal do servidor. Switchover acontece com a intervenção humana, diferentemente do Failover.
+
+Um switchover normalmente seria iniciado a fim de executar manutenção do sistema, como instalação de patches, atualização para uma nova release ou atualização do seu sistema. Em outros casos, o sistema inteiro é suficientemente complexo em que fazer o failover automático não é possível.
+
+Failover
+O failover, em ambiente de banco de dados, é a capacidade de determinado serviço migrar automaticamente para um outro servidor em standby quando existe ocorrência de falha ou término anormal do servidor, do sistema ou da rede que estava ativo até aquele instante. O Failover acontece sem intervenção humana e geralmente sem aviso prévio, diferente de switchover.
+
+Os projetistas de sistemas normalmente fornecem capacidade de failover em servidores, sistemas ou redes que exigem continua disponibilidade e um alto grau de confiabilidade.
+
+O segundo servidor imediatamente assumirá o trabalho do primeiro tão logo ele detecte alguma falha na primeira máquina. Alguns sistemas possuem a habilidade de mandar emails para os responsáveis.
+
+Reciprocamente, o Failback é o processo de restauração de um sistema/componente/serviço que se encontra em um estado de failover (ou seja, aquela máquina onde estava rodando o serviço que apresentou problemas) de volta a seu estado original que estava antes da falha.
+
+PostgreSQL
+
+No ambiente PostgreSQL, existe ferramentas capazes de gerenciar essa virada de forma automatizada e fácil. Porém alguns detalhes devem ficam claros para que não haja perda de informação.
+
+Modo Assíncrono - Se durante um processamento de uma transação ocorrer uma falha, quando ocorrer o failover, algumas transações serão perdidas, pois não terão sido enviadas para a réplica a tempo. De forma, que seu ambiente deve está preparado para isso. Por este motivo, é muito comum a virada se feita manualmente, para que não haja nenhuma perda.
+Modo Síncrono - Neste modo, não haverá nenhuma perda de transação, porém haverá um maior tempo de resposta nas transações, devido a validação ocorrer também nas réplicas configuradas como síncronas.
+Um cuidado deve ser tomado com a virada automatizada, pois uma falha na rede ou no serviço, pode levar a um failover desnecessário e a ocorrência de um split-brain, que é quando existe mais de um master respondendo.
+
+Documentação High Availability: http://www.postgresql.org/docs/9.5/static/high-availability.html
+Documentação Failover: http://www.postgresql.org/docs/9.5/static/warm-standby-failover.html
